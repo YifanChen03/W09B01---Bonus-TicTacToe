@@ -23,7 +23,7 @@ public class Game {
         firstPlayer = true;
         firstPlayedPieces = new boolean[9];
         secondPlayedPieces = new boolean[9];
-        //fülle firstPlayedPieces and secondPlayedPieces mit false
+        //fill arrays with false
         Arrays.fill(firstPlayedPieces, false);
         Arrays.fill(secondPlayedPieces, false);
         winner = null;
@@ -39,7 +39,7 @@ public class Game {
         int x;
         int y;
         int value;
-        //solange einer der beiden Spieler noch ungelegte Steine besitzt
+        //as long as one of the players has pieces left
         while (checkIfPiecesLeft()) {
             if (firstPlayer) {
                 m = first.makeMove(board, true, firstPlayedPieces, secondPlayedPieces);
@@ -51,15 +51,30 @@ public class Game {
             x = m.x();
             y = m.y();
             value = m.value();
+            //check if input position was outside of board and if player still has chosen piece
             if (x <= 2 && x >= 0 && y <= 2 && y >= 0 && !currPlayedPieces[value]) {
-                board[x][y] = new Field(value, firstPlayer);
+                //check if input position is already occupied if yes then check if value is smaller than chosen piece
+                if (board[x][y] == null) {
+                    board[x][y] = new Field(value, firstPlayer);
+                    currPlayedPieces[value] = true;
+                } else {
+                    if (board[x][y].value() < value) {
+                        board[x][y] = new Field(value, firstPlayer);
+                        currPlayedPieces[value] = true;
+                    } else {
+                        illegalMove();
+                        break;
+                    }
+                }
                 printBoard(board);
             } else {
-                if (firstPlayer) {
-                    winner = second;
-                } else {
-                    winner = first;
-                }
+                illegalMove();
+                break;
+            }
+            if (firstPlayer) {
+                 firstPlayedPieces = currPlayedPieces;
+            } else {
+                secondPlayedPieces = currPlayedPieces;
             }
             firstPlayer = !firstPlayer;
             printBoard(board);
@@ -97,6 +112,14 @@ public class Game {
             }
         }
         return false;
+    }
+
+    public void illegalMove() {
+        if (firstPlayer) {
+            winner = second;
+        } else {
+            winner = first;
+        }
     }
 
     public static void main(String[] args) {
