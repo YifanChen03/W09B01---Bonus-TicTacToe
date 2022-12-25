@@ -2,18 +2,68 @@ package pgdp.tictactoe;
 
 import pgdp.tictactoe.ai.HumanPlayer;
 
+import java.util.Arrays;
+
+import java.util.stream.Stream;
+
 public class Game {
+    private PenguAI first;
+    private PenguAI second;
+    private Field[][] board;
+    private boolean firstPlayer;
+    private boolean[] firstPlayedPieces;
+    private boolean[] secondPlayedPieces;
+    private PenguAI winner;
 
     public Game(PenguAI first, PenguAI second) {
+        this.first = first;
+        this.second = second;
 
+        board = new Field[3][3];
+        firstPlayer = true;
+        firstPlayedPieces = new boolean[9];
+        secondPlayedPieces = new boolean[9];
+        //fülle firstPlayedPieces and secondPlayedPieces mit false
+        Arrays.fill(firstPlayedPieces, false);
+        Arrays.fill(secondPlayedPieces, false);
+        winner = null;
     }
 
     public PenguAI getWinner() {
-        return null;
+        return winner;
     }
 
     public void playGame() {
-
+        Move m;
+        boolean[] currPlayedPieces;
+        int x;
+        int y;
+        int value;
+        //solange einer der beiden Spieler noch ungelegte Steine besitzt
+        while (checkIfPiecesLeft()) {
+            if (firstPlayer) {
+                m = first.makeMove(board, true, firstPlayedPieces, secondPlayedPieces);
+                currPlayedPieces = firstPlayedPieces;
+            } else {
+                m = second.makeMove(board, false, firstPlayedPieces, secondPlayedPieces);
+                currPlayedPieces = secondPlayedPieces;
+            }
+            x = m.x();
+            y = m.y();
+            value = m.value();
+            if (x <= 2 && x >= 0 && y <= 2 && y >= 0 && !currPlayedPieces[value]) {
+                board[x][y] = new Field(value, firstPlayer);
+                printBoard(board);
+            } else {
+                if (firstPlayer) {
+                    winner = second;
+                } else {
+                    winner = first;
+                }
+            }
+            firstPlayer = !firstPlayer;
+            printBoard(board);
+        }
     }
 
     public static void printBoard(Field[][] board) {
@@ -33,6 +83,20 @@ public class Game {
             }
         }
         System.out.println("┗━━━┻━━━┻━━━┛");
+    }
+
+    public boolean checkIfPiecesLeft() {
+        for (boolean b : firstPlayedPieces) {
+            if (!b) {
+                return true;
+            }
+        }
+        for (boolean b : secondPlayedPieces) {
+            if (!b) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static void main(String[] args) {
