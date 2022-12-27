@@ -80,7 +80,7 @@ public class Game {
                     break;
                 }
             } else {
-                m = second.makeMove(board, true, firstPlayedPieces, secondPlayedPieces);
+                m = second.makeMove(board, false, firstPlayedPieces, secondPlayedPieces);
                 x = m.x();
                 y = m.y();
                 value = m.value();
