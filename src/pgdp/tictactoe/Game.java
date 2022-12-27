@@ -108,8 +108,11 @@ public class Game {
                     break;
                 }
             }
-            if (checkWin() != null)
+            PenguAI temp = checkWin();
+            if (temp != null) {
+                winner = temp;
                 break;
+            }
             firstPlayer = !firstPlayer;
         }
         //Move m;
@@ -226,11 +229,13 @@ public class Game {
 
         for (List<int[]> row : winningPlaces) {
             if (fP_fields.stream().map(le -> Arrays.toString(le)).collect(Collectors.toList())
-                    .containsAll(row.stream().map(le -> Arrays.toString(le)).collect(Collectors.toList())))
+                    .containsAll(row.stream().map(le -> Arrays.toString(le)).collect(Collectors.toList()))) {
                 return first;
+            }
             if (sP_fields.stream().map(le -> Arrays.toString(le)).collect(Collectors.toList())
-                    .containsAll(row.stream().map(le -> Arrays.toString(le)).collect(Collectors.toList())))
+                    .containsAll(row.stream().map(le -> Arrays.toString(le)).collect(Collectors.toList()))) {
                 return second;
+            }
         }
         return null;
     }
