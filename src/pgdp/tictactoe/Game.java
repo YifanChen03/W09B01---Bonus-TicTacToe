@@ -61,18 +61,14 @@ public class Game {
                     int[] toAdd = new int[]{x, y};
                     //check if input position is already occupied if yes then check if value is smaller than chosen piece
                     if (board[x][y] == null) {
-                        board[x][y] = new Field(value, true);
-                        firstPlayedPieces[value] = true;
-                        fP_fields.add(toAdd);
+                        addToBoard(x, y, value, toAdd);
                     } else {
                         if (board[x][y].value() < value) {
-                                board[x][y] = new Field(value, true);
-                                firstPlayedPieces[value] = true;
-                                fP_fields.add(toAdd);
-                                sP_fields.removeIf(lE -> Arrays.toString(lE).equals(Arrays.toString(toAdd)));
-                            } else {
-                                illegalMove();
-                                break;
+                            addToBoard(x, y, value, toAdd);
+                            sP_fields.removeIf(lE -> Arrays.toString(lE).equals(Arrays.toString(toAdd)));
+                        } else {
+                            illegalMove();
+                            break;
                         }
                     }
                 } else {
@@ -91,14 +87,10 @@ public class Game {
                     int[] toAdd = new int[]{x, y};
                     //check if input position is already occupied if yes then check if value is smaller than chosen piece
                     if (board[x][y] == null) {
-                        board[x][y] = new Field(value, false);
-                        secondPlayedPieces[value] = true;
-                        sP_fields.add(toAdd);
+                        addToBoard(x, y, value, toAdd);
                     } else {
                         if (board[x][y].value() < value) {
-                            board[x][y] = new Field(value, false);
-                            secondPlayedPieces[value] = true;
-                            sP_fields.add(toAdd);
+                            addToBoard(x, y, value, toAdd);
                             fP_fields.removeIf(lE -> Arrays.toString(lE).equals(Arrays.toString(toAdd)));
                         } else {
                             illegalMove();
@@ -192,6 +184,18 @@ public class Game {
             }
         }
         return null;
+    }
+
+    public void addToBoard(int x, int y, int value, int[] toAdd) {
+        if (isFirstPlayer) {
+            board[x][y] = new Field(value, true);
+            firstPlayedPieces[value] = true;
+            fP_fields.add(toAdd);
+        } else {
+            board[x][y] = new Field(value, false);
+            secondPlayedPieces[value] = true;
+            sP_fields.add(toAdd);
+        }
     }
 
     public static void main(String[] args) {
