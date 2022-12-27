@@ -14,7 +14,7 @@ public class Game {
     private PenguAI first;
     private PenguAI second;
     private Field[][] board;
-    private boolean firstPlayer;
+    private boolean isFirstPlayer;
     private boolean[] firstPlayedPieces;
     private boolean[] secondPlayedPieces;
     private PenguAI winner;
@@ -26,7 +26,7 @@ public class Game {
         this.second = second;
 
         board = new Field[3][3];
-        firstPlayer = true;
+        isFirstPlayer = true;
         firstPlayedPieces = new boolean[9];
         secondPlayedPieces = new boolean[9];
         //fill arrays with false
@@ -49,7 +49,7 @@ public class Game {
 
         //as long as one of the players has pieces left
         while (checkIfPiecesLeft()) {
-            if (firstPlayer) {
+            if (isFirstPlayer) {
                 m = first.makeMove(board, true, firstPlayedPieces, secondPlayedPieces);
                 x = m.x();
                 y = m.y();
@@ -61,12 +61,12 @@ public class Game {
                     int[] toAdd = new int[]{x, y};
                     //check if input position is already occupied if yes then check if value is smaller than chosen piece
                     if (board[x][y] == null) {
-                        board[x][y] = new Field(value, firstPlayer);
+                        board[x][y] = new Field(value, true);
                         firstPlayedPieces[value] = true;
                         fP_fields.add(toAdd);
                     } else {
                         if (board[x][y].value() < value) {
-                                board[x][y] = new Field(value, firstPlayer);
+                                board[x][y] = new Field(value, true);
                                 firstPlayedPieces[value] = true;
                                 fP_fields.add(toAdd);
                                 sP_fields.removeIf(lE -> Arrays.toString(lE).equals(Arrays.toString(toAdd)));
@@ -91,12 +91,12 @@ public class Game {
                     int[] toAdd = new int[]{x, y};
                     //check if input position is already occupied if yes then check if value is smaller than chosen piece
                     if (board[x][y] == null) {
-                        board[x][y] = new Field(value, firstPlayer);
+                        board[x][y] = new Field(value, false);
                         secondPlayedPieces[value] = true;
                         sP_fields.add(toAdd);
                     } else {
                         if (board[x][y].value() < value) {
-                            board[x][y] = new Field(value, firstPlayer);
+                            board[x][y] = new Field(value, false);
                             secondPlayedPieces[value] = true;
                             sP_fields.add(toAdd);
                             fP_fields.removeIf(lE -> Arrays.toString(lE).equals(Arrays.toString(toAdd)));
@@ -115,7 +115,7 @@ public class Game {
                 winner = temp;
                 break;
             }
-            firstPlayer = !firstPlayer;
+            isFirstPlayer = !isFirstPlayer;
         }
     }
 
@@ -153,7 +153,7 @@ public class Game {
     }
 
     public void illegalMove() {
-        if (firstPlayer) {
+        if (isFirstPlayer) {
             winner = second;
         } else {
             winner = first;
