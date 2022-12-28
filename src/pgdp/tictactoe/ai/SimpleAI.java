@@ -1,9 +1,6 @@
 package pgdp.tictactoe.ai;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import pgdp.tictactoe.Field;
@@ -15,6 +12,7 @@ public class SimpleAI extends PenguAI {
 
     private Random random;
     private List<Integer> valuesLeft;
+    private List<Integer> oppValuesLeft;
     private List<int[]> ownFields;
     private List<int[]> oppFields;
     private boolean thisIsFirstPlayer;
@@ -25,6 +23,7 @@ public class SimpleAI extends PenguAI {
         for (int i = 0; i < 9; i++) {
             valuesLeft.add(i);
         }
+        oppValuesLeft = new ArrayList<>();
         ownFields = new ArrayList<>();
         oppFields = new ArrayList<>();
         thisIsFirstPlayer = true;
@@ -33,32 +32,47 @@ public class SimpleAI extends PenguAI {
     @Override
     public Move makeMove(Field[][] board, boolean firstPlayer, boolean[] firstPlayedPieces,
             boolean[] secondPlayedPieces) {
+        //still needs to calculate the defending move that makes opponent unable to win
+
         //determine once ifFirstPlayer
-        if (ownFields.size() == 0) {
-            thisIsFirstPlayer = determineIfFirstPlayer();
+        thisIsFirstPlayer = firstPlayer;
+
+        if (firstPlayer) {
+            oppValuesLeft = convertOppValues(firstPlayedPieces);
+        } else {
+            oppValuesLeft = convertOppValues(secondPlayedPieces);
         }
-        oppFields = getOppFields(board);
-        oppFields.stream().forEach(le -> System.out.println(Arrays.toString(le)));
+
+        oppFields = findOppFields(board);
+        //oppFields.stream().forEach(le -> System.out.println(Arrays.toString(le)));
 
         //calculate legalMoves
         List<int[]> legalMoves = calcLegalMoves(board);
-        //legalMoves.stream().forEach(le -> System.out.println(Arrays.toString(le)));
+        //List<int[]> oppLegalMoves = calcOppLegalMoves(board);
+        /*System.out.println("legal Moves");
+        legalMoves.stream().forEach(le -> System.out.print(Arrays.toString(le) + " "));
+        System.out.println("opp legal Moves");
+        oppLegalMoves.stream().forEach(le -> System.out.print(Arrays.toString(le) + " "));*/
 
         //calculate winningMoves for this AI and play if possible
-        List<int[]> winningMoves = calcWinningMoves(board, legalMoves, ownFields);
+        //System.out.println("own Moves");
+        List<int[]> winningMoves = calcWinningMoves(legalMoves, ownFields);
         if (winningMoves.size() > 0) {
+            System.out.println("winning moves: ");
+            winningMoves.stream().forEach(le -> System.out.println(Arrays.toString(le)));
             System.out.println("played winning move: ");
             return chooseMove(winningMoves);
         }
-        //winningMoves.stream().forEach(le -> System.out.println(Arrays.toString(le)));
 
         //calculate winningMoves for opponent and play if possible
-        List<int[]> defendingMoves = calcWinningMoves(board, legalMoves, oppFields);
+        //System.out.println("opp Moves");
+        List<int[]> defendingMoves = calculateBestDefendingMoves(board, legalMoves);
         if (defendingMoves.size() > 0) {
+            System.out.println("defending moves: ");
+            defendingMoves.stream().forEach(le -> System.out.println(Arrays.toString(le)));
             System.out.println("played defending move: ");
             return chooseMove(defendingMoves);
         }
-        //defendingMoves.stream().forEach(le -> System.out.println(Arrays.toString(le)));
 
         //otherwise play any legalMove
         System.out.println("played legal move: ");
@@ -71,7 +85,8 @@ public class SimpleAI extends PenguAI {
         for (int f_y = 0; f_y < board.length; f_y++) {
             for (int f_x = 0; f_x < board.length; f_x++) {
                 if (board[f_x][f_y] == null ||
-                        board[f_x][f_y].value() < valuesLeft.stream().mapToInt(n -> n).max().orElse(-1)) {
+                        (board[f_x][f_y].value() < valuesLeft.stream().mapToInt(n -> n).max().orElse(-1)
+                                && board[f_x][f_y].firstPlayer() != thisIsFirstPlayer)) {
                     output.add(new int[]{f_x, f_y});
                 }
             }
@@ -80,20 +95,15 @@ public class SimpleAI extends PenguAI {
         return output;
     }
 
-    private List<int[]> calcWinningMoves(Field[][] board, List<int[]> legalMoves, List<int[]> xFields) {
+    private List<int[]> calcOppLegalMoves(Field[][] board) {
         List<int[]> output = new ArrayList<>();
 
-        //check for every Field of board if owning it would be a win
         for (int f_y = 0; f_y < board.length; f_y++) {
             for (int f_x = 0; f_x < board.length; f_x++) {
-                int[] testField = new int[]{f_x, f_y};
-                if (legalMoves.stream().map(le -> Arrays.toString(le)).collect(Collectors.toList())
-                        .contains(Arrays.toString(testField))) {
-                    xFields.add(testField);
-                    if (Game.checkWin(xFields, null) == 1) {
-                        output.add(testField);
-                    }
-                    xFields.removeIf(lE -> Arrays.toString(lE).equals(Arrays.toString(testField)));
+                if (board[f_x][f_y] == null ||
+                        (board[f_x][f_y].value() < oppValuesLeft.stream().mapToInt(n -> n).max().orElse(-1)
+                                && board[f_x][f_y].firstPlayer() == thisIsFirstPlayer)) {
+                    output.add(new int[]{f_x, f_y});
                 }
             }
         }
@@ -101,7 +111,47 @@ public class SimpleAI extends PenguAI {
         return output;
     }
 
-    private List<int[]> getOppFields(Field[][] board) {
+    private List<int[]> calcWinningMoves(List<int[]> xlegalMoves, List<int[]> xFields) {
+        List<int[]> output = new ArrayList<>();
+        //xFields.forEach(le -> System.out.println(Arrays.toString(le)));
+        //check for every Field of legalMoves if owning it would be a win
+        for (int[] testField : xlegalMoves) {
+            xFields.add(testField);
+            if (Game.checkWin(xFields, null) == 1) {
+                output.add(testField);
+            }
+            xFields.removeIf(lE -> Arrays.toString(lE).equals(Arrays.toString(testField)));
+        }
+
+        return output;
+    }
+
+    private List<int[]> calculateBestDefendingMoves(Field[][] board, List<int[]> legalMoves) {
+        List<int[]> output = new ArrayList<>();
+
+        for (int[] field : legalMoves) {
+            //make copy of board into testBoard
+            Field[][] testBoard = new Field[3][3];
+            for (int f_y = 0; f_y < board.length; f_y++) {
+                for (int f_x = 0; f_x < board.length; f_x++) {
+                    if (board[f_x][f_y] != null) {
+                        testBoard[f_x][f_y] = new Field(board[f_x][f_y].value(), board[f_x][f_y].firstPlayer());
+                    }
+                }
+            }
+
+            testBoard[field[0]][field[1]] = new Field(valuesLeft.stream()
+                    .mapToInt(n -> n).max().orElse(-1), thisIsFirstPlayer);
+            List<int[]> oppLegalMoves = calcOppLegalMoves(testBoard);
+            if (calcWinningMoves(oppLegalMoves, oppFields).size() == 0) {
+                output.add(field);
+            }
+        }
+
+        return output;
+    }
+
+    private List<int[]> findOppFields(Field[][] board) {
         List<int[]> output = new ArrayList<>();
 
         //check for every Field of board if it is owned by opponent
@@ -127,7 +177,15 @@ public class SimpleAI extends PenguAI {
         return m;
     }
 
-    private boolean determineIfFirstPlayer() {
-        return Game.getfP_fields().equals(ownFields);
+    private List<Integer> convertOppValues(boolean[] playedPieces) {
+        List<Integer> output = new ArrayList<>();
+
+        for (int i = 0; i < playedPieces.length; i++) {
+            if (!playedPieces[i]) {
+                output.add(i);
+            }
+        }
+
+        return output;
     }
 }

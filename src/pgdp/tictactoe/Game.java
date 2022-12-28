@@ -19,8 +19,8 @@ public class Game {
     private boolean[] firstPlayedPieces;
     private boolean[] secondPlayedPieces;
     private PenguAI winner;
-    private static List<int[]> fP_fields;
-    private static List<int[]> sP_fields;
+    private List<int[]> fP_fields;
+    private List<int[]> sP_fields;
 
     public Game(PenguAI first, PenguAI second) {
         this.first = first;
@@ -51,6 +51,11 @@ public class Game {
         //as long as one of the players has pieces left
         while (checkIfPiecesLeft()) {
             if (isFirstPlayer) {
+                if (noMovesLeft()) {
+                    winner = second;
+                    System.out.println("Player 1 has no moves left");
+                    break;
+                }
                 m = first.makeMove(board, true, firstPlayedPieces, secondPlayedPieces);
                 x = m.x();
                 y = m.y();
@@ -64,7 +69,7 @@ public class Game {
                     if (board[x][y] == null) {
                         addToBoard(x, y, value, toAdd);
                     } else {
-                        if (board[x][y].value() < value) {
+                        if (board[x][y].value() < value && board[x][y].firstPlayer() == false) {
                             addToBoard(x, y, value, toAdd);
                             sP_fields.removeIf(lE -> Arrays.toString(lE).equals(Arrays.toString(toAdd)));
                         } else {
@@ -77,6 +82,11 @@ public class Game {
                     break;
                 }
             } else {
+                if (noMovesLeft()) {
+                    winner = first;
+                    System.out.println("Player 2 has no moves left");
+                    break;
+                }
                 m = second.makeMove(board, false, firstPlayedPieces, secondPlayedPieces);
                 x = m.x();
                 y = m.y();
@@ -90,7 +100,7 @@ public class Game {
                     if (board[x][y] == null) {
                         addToBoard(x, y, value, toAdd);
                     } else {
-                        if (board[x][y].value() < value) {
+                        if (board[x][y].value() < value && board[x][y].firstPlayer() == true) {
                             addToBoard(x, y, value, toAdd);
                             fP_fields.removeIf(lE -> Arrays.toString(lE).equals(Arrays.toString(toAdd)));
                         } else {
@@ -151,8 +161,10 @@ public class Game {
 
     public void illegalMove() {
         if (isFirstPlayer) {
+            System.out.println("Player 1 made an illegal move");
             winner = second;
         } else {
+            System.out.println("Player 2 made an illegal move");
             winner = first;
         }
     }
@@ -203,13 +215,51 @@ public class Game {
         }
     }
 
-    //Getter and Setter
-    public static List<int[]> getfP_fields() {
-        return fP_fields;
+    private boolean noMovesLeft() {
+        if (isFirstPlayer) {
+            for (int f_y = 0; f_y < board.length; f_y++) {
+                for (int f_x = 0; f_x < board.length; f_x++) {
+                    if (board[f_x][f_y] == null || (board[f_x][f_y].value() < fPHighest() &&
+                            board[f_x][f_y].firstPlayer() != isFirstPlayer)) {
+                        return false;
+                    }
+                }
+            }
+        } else {
+            for (int f_y = 0; f_y < board.length; f_y++) {
+                for (int f_x = 0; f_x < board.length; f_x++) {
+                    if (board[f_x][f_y] == null || (board[f_x][f_y].value() < sPHighest() &&
+                            board[f_x][f_y].firstPlayer() != isFirstPlayer)) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
     }
 
-    public static List<int[]> getsP_fields() {
-        return sP_fields;
+    private int fPHighest() {
+        int n = -1;
+
+        for (int i = 0; i < firstPlayedPieces.length; i++) {
+            if (!firstPlayedPieces[i]) {
+                n = i;
+            }
+        }
+
+        return n;
+    }
+
+    private int sPHighest() {
+        int n = -1;
+
+        for (int i = 0; i < secondPlayedPieces.length; i++) {
+            if (!secondPlayedPieces[i]) {
+                n = i;
+            }
+        }
+
+        return n;
     }
 
     public static void main(String[] args) {
