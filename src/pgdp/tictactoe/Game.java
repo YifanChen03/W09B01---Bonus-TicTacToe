@@ -1,6 +1,7 @@
 package pgdp.tictactoe;
 
 import pgdp.tictactoe.ai.HumanPlayer;
+import pgdp.tictactoe.ai.SimpleAI;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,8 +19,8 @@ public class Game {
     private boolean[] firstPlayedPieces;
     private boolean[] secondPlayedPieces;
     private PenguAI winner;
-    private List<int[]> fP_fields;
-    private List<int[]> sP_fields;
+    private static List<int[]> fP_fields;
+    private static List<int[]> sP_fields;
 
     public Game(PenguAI first, PenguAI second) {
         this.first = first;
@@ -102,9 +103,13 @@ public class Game {
                     break;
                 }
             }
-            PenguAI temp = checkWin();
-            if (temp != null) {
-                winner = temp;
+            int temp = checkWin(fP_fields, sP_fields);
+            if (temp == 1) {
+                winner = first;
+                break;
+            }
+            if (temp == 2) {
+                winner = second;
                 break;
             }
             isFirstPlayer = !isFirstPlayer;
@@ -152,7 +157,7 @@ public class Game {
         }
     }
 
-    public PenguAI checkWin() {
+    public static int checkWin(List<int[]> fields1, List<int[]> fields2) {
         List<List<int[]>> winningPlaces = new ArrayList<>();
 
         List<int[]> firstRow = Arrays.asList(new int[][]{{0, 0}, {1, 0}, {2, 0}});
@@ -174,16 +179,16 @@ public class Game {
         winningPlaces.add(secondDia);
 
         for (List<int[]> row : winningPlaces) {
-            if (fP_fields.stream().map(le -> Arrays.toString(le)).collect(Collectors.toList())
+            if (fields1 != null && fields1.stream().map(le -> Arrays.toString(le)).collect(Collectors.toList())
                     .containsAll(row.stream().map(le -> Arrays.toString(le)).collect(Collectors.toList()))) {
-                return first;
+                return 1;
             }
-            if (sP_fields.stream().map(le -> Arrays.toString(le)).collect(Collectors.toList())
+            if (fields2 != null && fields2.stream().map(le -> Arrays.toString(le)).collect(Collectors.toList())
                     .containsAll(row.stream().map(le -> Arrays.toString(le)).collect(Collectors.toList()))) {
-                return second;
+                return 2;
             }
         }
-        return null;
+        return 0;
     }
 
     public void addToBoard(int x, int y, int value, int[] toAdd) {
@@ -198,9 +203,18 @@ public class Game {
         }
     }
 
+    //Getter and Setter
+    public static List<int[]> getfP_fields() {
+        return fP_fields;
+    }
+
+    public static List<int[]> getsP_fields() {
+        return sP_fields;
+    }
+
     public static void main(String[] args) {
         PenguAI firstPlayer = new HumanPlayer();
-        PenguAI secondPlayer = new HumanPlayer();
+        PenguAI secondPlayer = new SimpleAI();
         Game game = new Game(firstPlayer, secondPlayer);
         game.playGame();
         if(firstPlayer == game.getWinner()) {
