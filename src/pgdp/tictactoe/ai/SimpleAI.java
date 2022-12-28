@@ -33,6 +33,7 @@ public class SimpleAI extends PenguAI {
     public Move makeMove(Field[][] board, boolean firstPlayer, boolean[] firstPlayedPieces,
             boolean[] secondPlayedPieces) {
         //still needs to calculate the defending move that makes opponent unable to win
+        Game.printBoard(board);
 
         //determine once ifFirstPlayer
         thisIsFirstPlayer = firstPlayer;
@@ -48,7 +49,7 @@ public class SimpleAI extends PenguAI {
 
         //calculate legalMoves
         List<int[]> legalMoves = calcLegalMoves(board);
-        //List<int[]> oppLegalMoves = calcOppLegalMoves(board);
+        List<int[]> oppLegalMoves = calcOppLegalMoves(board);
         /*System.out.println("legal Moves");
         legalMoves.stream().forEach(le -> System.out.print(Arrays.toString(le) + " "));
         System.out.println("opp legal Moves");
@@ -58,18 +59,25 @@ public class SimpleAI extends PenguAI {
         //System.out.println("own Moves");
         List<int[]> winningMoves = calcWinningMoves(legalMoves, ownFields);
         if (winningMoves.size() > 0) {
-            System.out.println("winning moves: ");
-            winningMoves.stream().forEach(le -> System.out.println(Arrays.toString(le)));
+            //System.out.println("winning moves: ");
+            //winningMoves.stream().forEach(le -> System.out.println(Arrays.toString(le)));
             System.out.println("played winning move: ");
             return chooseMove(winningMoves);
         }
 
-        //calculate winningMoves for opponent and play if possible
+        //calculate optimal move to defend at least one winning move of opponent
         //System.out.println("opp Moves");
-        List<int[]> defendingMoves = calculateBestDefendingMoves(board, legalMoves);
+        List<int[]> bestDefendingMoves = calculateBestDefendingMoves(board, legalMoves);
+        if (bestDefendingMoves.size() > 0) {
+            //System.out.println("defending moves: ");
+            //defendingMoves.stream().forEach(le -> System.out.println(Arrays.toString(le)));
+            System.out.println("played optimal defending move: ");
+            return chooseMove(bestDefendingMoves);
+        }
+
+        //calculate winningMoves for opponent and play if possible
+        List<int[]> defendingMoves = calcWinningMoves(oppLegalMoves, oppFields);
         if (defendingMoves.size() > 0) {
-            System.out.println("defending moves: ");
-            defendingMoves.stream().forEach(le -> System.out.println(Arrays.toString(le)));
             System.out.println("played defending move: ");
             return chooseMove(defendingMoves);
         }
