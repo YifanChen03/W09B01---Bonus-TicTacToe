@@ -8,7 +8,7 @@ import pgdp.tictactoe.Game;
 import pgdp.tictactoe.Move;
 import pgdp.tictactoe.PenguAI;
 
-public class CompetitionAI extends PenguAI {
+public class SimpleAI extends PenguAI {
 
     private Random random;
     private List<Integer> ownValuesLeft;
@@ -23,7 +23,7 @@ public class CompetitionAI extends PenguAI {
     private boolean[] firstPlayedPieces;
     private boolean[] secondPlayedPieces;
 
-    public CompetitionAI() {
+    public SimpleAI() {
         random = new Random();
         ownValuesLeft = new ArrayList<>();
         ownMax = 8;
@@ -92,6 +92,11 @@ public class CompetitionAI extends PenguAI {
 
         //calculate winningMoves for opponent and play if possible
         List<int[]> defendingMoves = calcWinningMoves(oppLegalMoves, oppFields);
+        //filter winningMoves of opponent for ownLegalMoves
+        defendingMoves = defendingMoves.stream()
+                .filter(le -> (ownLegalMoves.stream().map(lm -> Arrays.toString(lm)).collect(Collectors.toList())
+                        .contains(Arrays.toString(le))))
+                .collect(Collectors.toList());
         if (defendingMoves.size() > 0) {
             System.out.println("played defending move: ");
             return chooseMove(defendingMoves, board);
@@ -222,10 +227,6 @@ public class CompetitionAI extends PenguAI {
         int[] xy = moveSet.get(random.nextInt(moveSet.size()));
         Move m = new Move(xy[0], xy[1], ownMax);
         System.out.println(Arrays.toString(xy) + " " + ownMax);
-        if (xy[0] >= 0 && xy[0] <= 2 && xy[1] >= 0 && xy[1] <= 2 && ownMax != -1) {
-            return m;
-        }
-        throw new RuntimeException("Es wurde ein illegaler Zug gespielt");
-        //return makeMove(board, firstPlayer, firstPlayedPieces,secondPlayedPieces);
+        return m;
     }
 }
