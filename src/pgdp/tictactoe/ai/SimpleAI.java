@@ -270,7 +270,7 @@ public class SimpleAI extends PenguAI {
     private Move chooseMove(List<int[]> moveSet, Field[][] board) {
         int[] xy = moveSet.get(random.nextInt(moveSet.size()));
         Move m = new Move(xy[0], xy[1], ownMax);
-        Game.printBoard(board);
+        //Game.printBoard(board);
         System.out.println(Arrays.toString(xy) + " " + ownMax);
         return m;
         /*if (xy[0] >= 0 && xy[0] <= 2 && xy[1] >= 0 && xy[1] <= 2 && ownMax != -1 && ownValuesLeft.size() > 0) {

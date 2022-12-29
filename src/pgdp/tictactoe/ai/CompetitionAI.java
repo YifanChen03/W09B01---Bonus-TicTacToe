@@ -83,8 +83,19 @@ public class CompetitionAI extends PenguAI {
             return chooseMove(winningMoves, board);
         }
 
+        //calculate moves that would force to winning moves
+        List<int[]> optimalOffensiveMoves = calculateOptimalOffensiveMoves(board, ownLegalMoves);
         //calculate optimal move to defend all winning moves of opponent
         List<int[]> optimalDefendingMoves = calculateOptimalDefendingMoves(board, ownLegalMoves);
+        //filter by optimalDefendingMoves to find if there is any optimal move
+        optimalOffensiveMoves = optimalOffensiveMoves.stream()
+                .filter(le -> (optimalDefendingMoves.stream().map(lm -> Arrays.toString(lm)).collect(Collectors.toList())
+                        .contains(Arrays.toString(le))))
+                .collect(Collectors.toList());
+        if (optimalOffensiveMoves.size() > 0) {
+            System.out.println("played optimal offensive move: ");
+            return chooseMove(optimalDefendingMoves, board);
+        }
         if (optimalDefendingMoves.size() > 0) {
             System.out.println("played optimal defending move: ");
             return chooseMove(optimalDefendingMoves, board);
@@ -188,6 +199,39 @@ public class CompetitionAI extends PenguAI {
         return output;
     }
 
+    private List<int[]> calculateOptimalOffensiveMoves(Field[][] board, List<int[]> xLegalMoves) {
+        List<int[]> output = new ArrayList<>();
+        Field[][] testBoard = new Field[3][3];
+
+        //make copy of board into testBoard
+        for (int[] field : allFields) {
+            int x = field[0];
+            int y = field[1];
+            if (board[x][y] != null) {
+                testBoard[x][y] = new Field(board[x][y].value(), board[x][y].firstPlayer());
+            }
+        }
+
+        for (int[] field : xLegalMoves) {
+            int x = field[0];
+            int y = field[1];
+            testBoard[x][y] = new Field(ownMax, firstPlayer);
+            List<int[]> tempOwnLegalMoves = calcLegalMoves(testBoard, true);
+            List<int[]> tempOwnFields = findFields(testBoard, true);
+            if (calcWinningMoves(tempOwnLegalMoves, tempOwnFields).size() > 1) {
+                //makes defending harder for opponent
+                output.add(field);
+            }
+            //reset field in testBoard
+            if (board[x][y] == null) {
+                testBoard[x][y] = null;
+            } else {
+                testBoard[x][y] = new Field(board[x][y].value(), board[x][y].firstPlayer());
+            }
+        }
+        return output;
+    }
+
     private List<int[]> findFields(Field[][] board, boolean forThisAI) {
         List<int[]> output = new ArrayList<>();
 
@@ -226,6 +270,7 @@ public class CompetitionAI extends PenguAI {
     private Move chooseMove(List<int[]> moveSet, Field[][] board) {
         int[] xy = moveSet.get(random.nextInt(moveSet.size()));
         Move m = new Move(xy[0], xy[1], ownMax);
+        //Game.printBoard(board);
         System.out.println(Arrays.toString(xy) + " " + ownMax);
         return m;
     }
