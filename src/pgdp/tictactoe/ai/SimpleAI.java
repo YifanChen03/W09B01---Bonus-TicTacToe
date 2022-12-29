@@ -41,7 +41,7 @@ public class SimpleAI extends PenguAI {
 
     @Override
     public Move makeMove(Field[][] board, boolean firstPlayer, boolean[] firstPlayedPieces,
-            boolean[] secondPlayedPieces) {
+                         boolean[] secondPlayedPieces) {
         //Game.printBoard(board);
 
         //initialize parameters
@@ -79,7 +79,7 @@ public class SimpleAI extends PenguAI {
         List<int[]> winningMoves = calcWinningMoves(ownLegalMoves, ownFields);
         //winningMoves.forEach(le -> System.out.println(Arrays.toString(le)));
         if (winningMoves.size() > 0) {
-            System.out.println("played winning move: ");
+            //System.out.println("played winning move: ");
             return chooseMove(winningMoves, board);
         }
 
@@ -93,11 +93,11 @@ public class SimpleAI extends PenguAI {
                         .contains(Arrays.toString(le))))
                 .collect(Collectors.toList());
         if (optimalOffensiveMoves.size() > 0) {
-            System.out.println("played optimal offensive move: ");
+            //System.out.println("played optimal offensive move: ");
             return chooseMove(optimalDefendingMoves, board);
         }
         if (optimalDefendingMoves.size() > 0) {
-            System.out.println("played optimal defending move: ");
+            //System.out.println("played optimal defending move: ");
             return chooseMove(optimalDefendingMoves, board);
         }
 
@@ -109,12 +109,12 @@ public class SimpleAI extends PenguAI {
                         .contains(Arrays.toString(le))))
                 .collect(Collectors.toList());
         if (defendingMoves.size() > 0) {
-            System.out.println("played defending move: ");
+            //System.out.println("played defending move: ");
             return chooseMove(defendingMoves, board);
         }
 
         //otherwise play any legalMove
-        System.out.println("played legal move: ");
+        //System.out.println("played legal move: ");
         return chooseMove(ownLegalMoves, board);
     }
 
@@ -269,42 +269,34 @@ public class SimpleAI extends PenguAI {
     }
     private Move chooseMove(List<int[]> moveSet, Field[][] board) {
         int[] xy = moveSet.get(random.nextInt(moveSet.size()));
-        Move m = new Move(xy[0], xy[1], ownMax);
-        //Game.printBoard(board);
-        System.out.println(Arrays.toString(xy) + " " + ownMax);
-        return m;
-        /*if (xy[0] >= 0 && xy[0] <= 2 && xy[1] >= 0 && xy[1] <= 2 && ownMax != -1 && ownValuesLeft.size() > 0) {
-            if ((firstPlayer && !firstPlayedPieces[ownMax]) || (!firstPlayer && !secondPlayedPieces[ownMax])) {
-                if (board[xy[0]][xy[1]] == null || (board[xy[0]][xy[1]].firstPlayer() != firstPlayer
-                        && board[xy[0]][xy[1]].value() < ownMax)){
-                    return m;
-                } else {
-                    Game.printBoard(board);
-                    System.out.println(Arrays.toString(xy) + " " + ownMax);
-                    if (firstPlayer) {
-                        System.out.println("ich bin erster Spieler");
-                    } else {
-                        System.out.println("ich bin zweiter Spieler");
-                    }
-                    System.out.println("firstPlayedPieces: " + Arrays.toString(firstPlayedPieces));
-                    System.out.println("secondPlayedPieces: " + Arrays.toString(secondPlayedPieces));
-                    throw new RuntimeException("Der Zug kann nicht mehr gespielt werden");
-                }
+        //should prefer covered fields
+        for (int[] field : moveSet) {
+            int x = field[0];
+            int y = field[1];
+            if (board[x][y] != null) {
+                xy = field;
+            }
+        }
+        int x = xy[0];
+        int y = xy[1];
+        int value;
+        if (board[x][y] == null) {
+            if (oppFields.size() >= 2) {
+                value = ownMax;
             } else {
-                Game.printBoard(board);
-                System.out.println(Arrays.toString(xy) + " " + ownMax);
-                if (firstPlayer) {
-                    System.out.println("ich bin erster Spieler");
-                } else {
-                    System.out.println("ich bin zweiter Spieler");
-                }
-                System.out.println("firstPlayedPieces: " + Arrays.toString(firstPlayedPieces));
-                System.out.println("secondPlayedPieces: " + Arrays.toString(secondPlayedPieces));
-                throw new RuntimeException("Der Zug ist kein legalMove");
+                //play smallest value
+                value = ownValuesLeft.get(0);
             }
         } else {
-            throw new RuntimeException("Es wurde ein illegaler Zug gespielt");
-        }*/
-        //return makeMove(board, firstPlayer, firstPlayedPieces,secondPlayedPieces);
+            //cover field with smallest number possible
+            value = board[x][y].value() + 1;
+            while (!ownValuesLeft.contains(value)) {
+                value++;
+            }
+        }
+        Move m = new Move(x, y, value);
+        //Game.printBoard(board);
+        //System.out.println(Arrays.toString(xy) + " " + value);
+        return m;
     }
 }
