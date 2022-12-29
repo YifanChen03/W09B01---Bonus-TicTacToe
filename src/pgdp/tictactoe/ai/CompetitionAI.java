@@ -269,9 +269,23 @@ public class CompetitionAI extends PenguAI {
     }
     private Move chooseMove(List<int[]> moveSet, Field[][] board) {
         int[] xy = moveSet.get(random.nextInt(moveSet.size()));
-        Move m = new Move(xy[0], xy[1], ownMax);
+        int x = xy[0];
+        int y = xy[1];
+        int value;
+        if (board[x][y] == null) {
+            if (oppFields.size() >= 2) {
+                value = ownMax;
+            } else {
+                //play smallest value
+                value = ownValuesLeft.get(0);
+            }
+        } else {
+            //cover field
+            value = board[x][y].value() + 1;
+        }
+        Move m = new Move(x, y, value);
         //Game.printBoard(board);
-        System.out.println(Arrays.toString(xy) + " " + ownMax);
+        System.out.println(Arrays.toString(xy) + " " + value);
         return m;
     }
 }
