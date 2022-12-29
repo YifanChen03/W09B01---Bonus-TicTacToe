@@ -32,6 +32,7 @@ public class SimpleAI extends PenguAI {
         ownFields = new ArrayList<>();
         oppFields = new ArrayList<>();
         allFields = generateAllFields();
+        allFields.forEach(le -> Arrays.toString(le));
         //board is initialized later
         //firstPlayer is initialized later
         //firstPlayedPieces is initialized later
@@ -41,7 +42,8 @@ public class SimpleAI extends PenguAI {
     @Override
     public Move makeMove(Field[][] board, boolean firstPlayer, boolean[] firstPlayedPieces,
             boolean[] secondPlayedPieces) {
-        //Game.printBoard(board);
+        Game.printBoard(board);
+        System.out.println(firstPlayer);
 
         //initialize parameters
         this.board = board;
@@ -68,6 +70,7 @@ public class SimpleAI extends PenguAI {
 
         //calculate winningMoves for this AI and play if possible
         List<int[]> winningMoves = calcWinningMoves(ownLegalMoves, ownFields);
+        winningMoves.forEach(le -> System.out.println(Arrays.toString(le)));
         if (winningMoves.size() > 0) {
             System.out.println("played winning move: ");
             return chooseMove(winningMoves, board);
@@ -209,13 +212,6 @@ public class SimpleAI extends PenguAI {
     }
     private Move chooseMove(List<int[]> moveSet, Field[][] board) {
         int[] xy = moveSet.get(random.nextInt(moveSet.size()));
-        /*if (board[xy[0]][xy[1]] == null) {
-            //choose the smallest number
-            valueToPlay = valuesLeft.stream().mapToInt(n -> n).min().orElse(-1);
-        } else {
-            //choose the biggest number
-            valueToPlay = board[xy[0]][xy[1]].value() + 1;
-        }*/
         Move m = new Move(xy[0], xy[1], ownMax);
         System.out.println(Arrays.toString(xy) + " " + ownMax);
         return m;
