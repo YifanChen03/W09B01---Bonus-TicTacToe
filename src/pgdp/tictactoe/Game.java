@@ -268,7 +268,7 @@ public class Game {
     }
 
     public static void main(String[] args) {
-        PenguAI firstPlayer = new HumanPlayer();
+        PenguAI firstPlayer = new CompetitionAI();
         PenguAI secondPlayer = new HumanPlayer();
         Game game = new Game(firstPlayer, secondPlayer);
         game.playGame();
