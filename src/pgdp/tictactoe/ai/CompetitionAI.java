@@ -8,7 +8,7 @@ import pgdp.tictactoe.Game;
 import pgdp.tictactoe.Move;
 import pgdp.tictactoe.PenguAI;
 
-public class SimpleAI extends PenguAI {
+public class CompetitionAI extends PenguAI {
 
     private Random random;
     private List<Integer> ownValuesLeft;
@@ -23,7 +23,7 @@ public class SimpleAI extends PenguAI {
     private boolean[] firstPlayedPieces;
     private boolean[] secondPlayedPieces;
 
-    public SimpleAI() {
+    public CompetitionAI() {
         random = new Random();
         ownValuesLeft = new ArrayList<>();
         ownMax = 8;
