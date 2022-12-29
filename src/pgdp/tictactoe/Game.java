@@ -225,7 +225,7 @@ public class Game {
             for (int f_y = 0; f_y < board.length; f_y++) {
                 for (int f_x = 0; f_x < board.length; f_x++) {
                     if (board[f_x][f_y] == null || (board[f_x][f_y].value() < fPHighest() &&
-                            board[f_x][f_y].firstPlayer() != isFirstPlayer)) {
+                            board[f_x][f_y].firstPlayer() == false)) {
                         return false;
                     }
                 }
@@ -234,7 +234,7 @@ public class Game {
             for (int f_y = 0; f_y < board.length; f_y++) {
                 for (int f_x = 0; f_x < board.length; f_x++) {
                     if (board[f_x][f_y] == null || (board[f_x][f_y].value() < sPHighest() &&
-                            board[f_x][f_y].firstPlayer() != isFirstPlayer)) {
+                            board[f_x][f_y].firstPlayer() == true)) {
                         return false;
                     }
                 }
@@ -269,7 +269,7 @@ public class Game {
 
     public static void main(String[] args) {
         PenguAI firstPlayer = new HumanPlayer();
-        PenguAI secondPlayer = new CompetitionAI();
+        PenguAI secondPlayer = new HumanPlayer();
         Game game = new Game(firstPlayer, secondPlayer);
         game.playGame();
         if(firstPlayer == game.getWinner()) {
