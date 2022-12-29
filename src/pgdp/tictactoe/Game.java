@@ -74,11 +74,13 @@ public class Game {
                             addToBoard(x, y, value, toAdd);
                             sP_fields.removeIf(lE -> Arrays.toString(lE).equals(Arrays.toString(toAdd)));
                         } else {
+                            System.out.println("Move value too small");
                             illegalMove();
                             break;
                         }
                     }
                 } else {
+                    System.out.println("Move was outside of board or piece has been played already");
                     illegalMove();
                     break;
                 }
@@ -105,11 +107,13 @@ public class Game {
                             addToBoard(x, y, value, toAdd);
                             fP_fields.removeIf(lE -> Arrays.toString(lE).equals(Arrays.toString(toAdd)));
                         } else {
+                            System.out.println("Move value too small");
                             illegalMove();
                             break;
                         }
                     }
                 } else {
+                    System.out.println("Move was outside of board or piece has been played already");
                     illegalMove();
                     break;
                 }

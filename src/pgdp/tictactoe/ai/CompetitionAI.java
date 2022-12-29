@@ -79,7 +79,7 @@ public class CompetitionAI extends PenguAI {
         List<int[]> winningMoves = calcWinningMoves(ownLegalMoves, ownFields);
         //winningMoves.forEach(le -> System.out.println(Arrays.toString(le)));
         if (winningMoves.size() > 0) {
-            System.out.println("played winning move: ");
+            //System.out.println("played winning move: ");
             return chooseMove(winningMoves, board);
         }
 
@@ -93,11 +93,11 @@ public class CompetitionAI extends PenguAI {
                         .contains(Arrays.toString(le))))
                 .collect(Collectors.toList());
         if (optimalOffensiveMoves.size() > 0) {
-            System.out.println("played optimal offensive move: ");
+            //System.out.println("played optimal offensive move: ");
             return chooseMove(optimalDefendingMoves, board);
         }
         if (optimalDefendingMoves.size() > 0) {
-            System.out.println("played optimal defending move: ");
+            //System.out.println("played optimal defending move: ");
             return chooseMove(optimalDefendingMoves, board);
         }
 
@@ -109,12 +109,12 @@ public class CompetitionAI extends PenguAI {
                         .contains(Arrays.toString(le))))
                 .collect(Collectors.toList());
         if (defendingMoves.size() > 0) {
-            System.out.println("played defending move: ");
+            //System.out.println("played defending move: ");
             return chooseMove(defendingMoves, board);
         }
 
         //otherwise play any legalMove
-        System.out.println("played legal move: ");
+        //System.out.println("played legal move: ");
         return chooseMove(ownLegalMoves, board);
     }
 
@@ -288,44 +288,15 @@ public class CompetitionAI extends PenguAI {
                 value = ownValuesLeft.get(0);
             }
         } else {
-            //cover field
+            //cover field with smallest number possible
             value = board[x][y].value() + 1;
+            while (!ownValuesLeft.contains(value)) {
+                value++;
+            }
         }
         Move m = new Move(x, y, value);
         //Game.printBoard(board);
-        System.out.println(Arrays.toString(xy) + " " + value);
+        //System.out.println(Arrays.toString(xy) + " " + value);
         return m;
-        /*if (xy[0] >= 0 && xy[0] <= 2 && xy[1] >= 0 && xy[1] <= 2 && ownMax != -1 && ownValuesLeft.size() > 0) {
-            if ((firstPlayer && !firstPlayedPieces[ownMax]) || (!firstPlayer && !secondPlayedPieces[ownMax])) {
-                if (board[xy[0]][xy[1]] == null || (board[xy[0]][xy[1]].firstPlayer() != firstPlayer
-                        && board[xy[0]][xy[1]].value() < ownMax)){
-                    return m;
-                } else {
-                    Game.printBoard(board);
-                    System.out.println(Arrays.toString(xy) + " " + ownMax);
-                    if (firstPlayer) {
-                        System.out.println("ich bin erster Spieler");
-                    } else {
-                        System.out.println("ich bin zweiter Spieler");
-                    }
-                    System.out.println("firstPlayedPieces: " + Arrays.toString(firstPlayedPieces));
-                    System.out.println("secondPlayedPieces: " + Arrays.toString(secondPlayedPieces));
-                    throw new RuntimeException("Der Zug kann nicht mehr gespielt werden");
-                }
-            } else {
-                Game.printBoard(board);
-                System.out.println(Arrays.toString(xy) + " " + ownMax);
-                if (firstPlayer) {
-                    System.out.println("ich bin erster Spieler");
-                } else {
-                    System.out.println("ich bin zweiter Spieler");
-                }
-                System.out.println("firstPlayedPieces: " + Arrays.toString(firstPlayedPieces));
-                System.out.println("secondPlayedPieces: " + Arrays.toString(secondPlayedPieces));
-                throw new RuntimeException("Der Zug ist kein legalMove");
-            }
-        } else {
-            throw new RuntimeException("Es wurde ein illegaler Zug gespielt");
-        }*/
     }
 }
