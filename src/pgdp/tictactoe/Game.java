@@ -53,7 +53,7 @@ public class Game {
             if (isFirstPlayer) {
                 if (noMovesLeft()) {
                     winner = second;
-                    //System.out.println("Player 1 has no moves left");
+                    System.out.println("Player 1 has no moves left");
                     break;
                 }
                 m = first.makeMove(board, true, firstPlayedPieces, secondPlayedPieces);
@@ -84,7 +84,7 @@ public class Game {
             } else {
                 if (noMovesLeft()) {
                     winner = first;
-                    //System.out.println("Player 2 has no moves left");
+                    System.out.println("Player 2 has no moves left");
                     break;
                 }
                 m = second.makeMove(board, false, firstPlayedPieces, secondPlayedPieces);
@@ -161,10 +161,10 @@ public class Game {
 
     public void illegalMove() {
         if (isFirstPlayer) {
-            //System.out.println("Player 1 made an illegal move");
+            System.out.println("Player 1 played an illegal move");
             winner = second;
         } else {
-            //System.out.println("Player 2 made an illegal move");
+            System.out.println("Player 2 played an illegal move");
             winner = first;
         }
     }
@@ -263,7 +263,7 @@ public class Game {
     }
 
     public static void main(String[] args) {
-        PenguAI firstPlayer = new SimpleAI();
+        PenguAI firstPlayer = new HumanPlayer();
         PenguAI secondPlayer = new SimpleAI();
         Game game = new Game(firstPlayer, secondPlayer);
         game.playGame();
