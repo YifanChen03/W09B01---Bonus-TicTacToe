@@ -42,8 +42,8 @@ public class CompetitionAI extends PenguAI {
     @Override
     public Move makeMove(Field[][] board, boolean firstPlayer, boolean[] firstPlayedPieces,
                          boolean[] secondPlayedPieces) {
-        Game.printBoard(board);
-        System.out.println(firstPlayer);
+        //Game.printBoard(board);
+        //System.out.println(firstPlayer);
 
         //initialize parameters
         this.board = board;
