@@ -8,7 +8,7 @@ import pgdp.tictactoe.Game;
 import pgdp.tictactoe.Move;
 import pgdp.tictactoe.PenguAI;
 
-public class CompetitionAI extends PenguAI {
+public class SimpleAIV1 extends PenguAI {
 
     private Random random;
     private List<Integer> valuesLeft;
@@ -17,7 +17,7 @@ public class CompetitionAI extends PenguAI {
     private List<int[]> oppFields;
     private boolean thisIsFirstPlayer;
 
-    public CompetitionAI() {
+    public SimpleAIV1() {
         random = new Random();
         valuesLeft = new ArrayList<>();
         for (int i = 0; i < 9; i++) {
@@ -45,6 +45,7 @@ public class CompetitionAI extends PenguAI {
         }
 
         oppFields = findOppFields(board);
+        ownFields = findOwnFields(board);
         //oppFields.stream().forEach(le -> System.out.println(Arrays.toString(le)));
 
         //calculate legalMoves
@@ -62,7 +63,7 @@ public class CompetitionAI extends PenguAI {
             //System.out.println("winning moves: ");
             //winningMoves.stream().forEach(le -> System.out.println(Arrays.toString(le)));
             System.out.println("played winning move: ");
-            return chooseMove(winningMoves);
+            return chooseMove(winningMoves, board);
         }
 
         //calculate optimal move to defend at least one winning move of opponent
@@ -72,19 +73,19 @@ public class CompetitionAI extends PenguAI {
             //System.out.println("defending moves: ");
             //defendingMoves.stream().forEach(le -> System.out.println(Arrays.toString(le)));
             System.out.println("played optimal defending move: ");
-            return chooseMove(bestDefendingMoves);
+            return chooseMove(bestDefendingMoves, board);
         }
 
         //calculate winningMoves for opponent and play if possible
         List<int[]> defendingMoves = calcWinningMoves(oppLegalMoves, oppFields);
         if (defendingMoves.size() > 0) {
             System.out.println("played defending move: ");
-            return chooseMove(defendingMoves);
+            return chooseMove(defendingMoves, board);
         }
 
         //otherwise play any legalMove
         System.out.println("played legal move: ");
-        return chooseMove(legalMoves);
+        return chooseMove(legalMoves, board);
     }
 
     private List<int[]> calcLegalMoves(Field[][] board) {
@@ -136,26 +137,39 @@ public class CompetitionAI extends PenguAI {
 
     private List<int[]> calculateBestDefendingMoves(Field[][] board, List<int[]> legalMoves) {
         List<int[]> output = new ArrayList<>();
-
-        for (int[] field : legalMoves) {
-            //make copy of board into testBoard
-            Field[][] testBoard = new Field[3][3];
-            for (int f_y = 0; f_y < board.length; f_y++) {
-                for (int f_x = 0; f_x < board.length; f_x++) {
-                    if (board[f_x][f_y] != null) {
-                        testBoard[f_x][f_y] = new Field(board[f_x][f_y].value(), board[f_x][f_y].firstPlayer());
-                    }
+        Field[][] testBoard = new Field[3][3];
+        //make copy of board into testBoard
+        for (int f_y = 0; f_y < board.length; f_y++) {
+            for (int f_x = 0; f_x < board.length; f_x++) {
+                if (board[f_x][f_y] != null) {
+                    testBoard[f_x][f_y] = new Field(board[f_x][f_y].value(), board[f_x][f_y].firstPlayer());
                 }
             }
+        }
 
-            testBoard[field[0]][field[1]] = new Field(valuesLeft.stream()
-                    .mapToInt(n -> n).max().orElse(-1), thisIsFirstPlayer);
+        for (int[] field : legalMoves) {
+
+            /*if (testBoard[field[0]][field[1]] == null) {
+                testBoard[field[0]][field[1]] = new Field(valuesLeft.stream().mapToInt(n -> n).min().orElse(-1),
+                        thisIsFirstPlayer);
+            } else {
+                testBoard[field[0]][field[1]] = new Field(testBoard[field[0]][field[1]].value() + 1,
+                        thisIsFirstPlayer);
+            }*/
+            testBoard[field[0]][field[1]] = new Field(valuesLeft.stream().mapToInt(n -> n).max().orElse(-1),
+                    thisIsFirstPlayer);
             List<int[]> oppLegalMoves = calcOppLegalMoves(testBoard);
             if (calcWinningMoves(oppLegalMoves, oppFields).size() == 0) {
                 output.add(field);
             }
+            if (board[field[0]][field[1]] == null) {
+                testBoard[field[0]][field[1]] = null;
+            } else {
+                testBoard[field[0]][field[1]] = new Field(board[field[0]][field[1]].value(),
+                        board[field[0]][field[1]].firstPlayer());
+            }
         }
-
+        //output.forEach(le -> System.out.println(Arrays.toString(le)));
         return output;
     }
 
@@ -175,12 +189,35 @@ public class CompetitionAI extends PenguAI {
         return output;
     }
 
-    private Move chooseMove(List<int[]> moveSet) {
+    private List<int[]> findOwnFields(Field[][] board) {
+        List<int[]> output = new ArrayList<>();
+
+        //check for every Field of board if it is owned by opponent
+        for (int f_y = 0; f_y < board.length; f_y++) {
+            for (int f_x = 0; f_x < board.length; f_x++) {
+                int[] checkField = new int[]{f_x, f_y};
+                if (board[f_x][f_y] != null && board[f_x][f_y].firstPlayer() == thisIsFirstPlayer) {
+                    output.add(checkField);
+                }
+            }
+        }
+
+        return output;
+    }
+
+    private Move chooseMove(List<int[]> moveSet, Field[][] board) {
         int[] xy = moveSet.get(random.nextInt(moveSet.size()));
-        Integer valueToPlay = valuesLeft.stream().mapToInt(n -> n).max().orElse(-1);
+        Integer valueToPlay;
+        /*if (board[xy[0]][xy[1]] == null) {
+            //choose the smallest number
+            valueToPlay = valuesLeft.stream().mapToInt(n -> n).min().orElse(-1);
+        } else {
+            //choose the biggest number
+            valueToPlay = board[xy[0]][xy[1]].value() + 1;
+        }*/
+        valueToPlay = valuesLeft.stream().mapToInt(n -> n).max().orElse(-1);
         Move m = new Move(xy[0], xy[1], valueToPlay);
         valuesLeft.removeIf(n -> n == valueToPlay);
-        ownFields.add(xy);
         System.out.println(Arrays.toString(xy));
         return m;
     }
