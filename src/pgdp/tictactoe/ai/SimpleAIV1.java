@@ -149,15 +149,15 @@ public class SimpleAIV1 extends PenguAI {
 
         for (int[] field : legalMoves) {
 
-            /*if (testBoard[field[0]][field[1]] == null) {
+            if (testBoard[field[0]][field[1]] == null) {
                 testBoard[field[0]][field[1]] = new Field(valuesLeft.stream().mapToInt(n -> n).min().orElse(-1),
                         thisIsFirstPlayer);
             } else {
                 testBoard[field[0]][field[1]] = new Field(testBoard[field[0]][field[1]].value() + 1,
                         thisIsFirstPlayer);
-            }*/
-            testBoard[field[0]][field[1]] = new Field(valuesLeft.stream().mapToInt(n -> n).max().orElse(-1),
-                    thisIsFirstPlayer);
+            }
+            /*testBoard[field[0]][field[1]] = new Field(valuesLeft.stream().mapToInt(n -> n).max().orElse(-1),
+                    thisIsFirstPlayer);*/
             List<int[]> oppLegalMoves = calcOppLegalMoves(testBoard);
             if (calcWinningMoves(oppLegalMoves, oppFields).size() == 0) {
                 output.add(field);
@@ -208,14 +208,14 @@ public class SimpleAIV1 extends PenguAI {
     private Move chooseMove(List<int[]> moveSet, Field[][] board) {
         int[] xy = moveSet.get(random.nextInt(moveSet.size()));
         Integer valueToPlay;
-        /*if (board[xy[0]][xy[1]] == null) {
+        if (board[xy[0]][xy[1]] == null) {
             //choose the smallest number
             valueToPlay = valuesLeft.stream().mapToInt(n -> n).min().orElse(-1);
         } else {
             //choose the biggest number
             valueToPlay = board[xy[0]][xy[1]].value() + 1;
-        }*/
-        valueToPlay = valuesLeft.stream().mapToInt(n -> n).max().orElse(-1);
+        }
+        //valueToPlay = valuesLeft.stream().mapToInt(n -> n).max().orElse(-1);
         Move m = new Move(xy[0], xy[1], valueToPlay);
         valuesLeft.removeIf(n -> n == valueToPlay);
         System.out.println(Arrays.toString(xy));
