@@ -43,7 +43,6 @@ public class CompetitionAI extends PenguAI {
     public Move makeMove(Field[][] board, boolean firstPlayer, boolean[] firstPlayedPieces,
                          boolean[] secondPlayedPieces) {
         //Game.printBoard(board);
-        //System.out.println(firstPlayer);
 
         //initialize parameters
         this.board = board;
@@ -58,8 +57,16 @@ public class CompetitionAI extends PenguAI {
             ownValuesLeft = convertPlayedValues(secondPlayedPieces);
             oppValuesLeft = convertPlayedValues(firstPlayedPieces);
         }
-        ownMax = ownValuesLeft.get(ownValuesLeft.size() - 1);
-        oppMax = oppValuesLeft.get(oppValuesLeft.size() - 1);
+        if (ownValuesLeft.size() > 0) {
+            ownMax = ownValuesLeft.get(ownValuesLeft.size() - 1);
+        } else {
+            ownMax = -1;
+        }
+        if (oppValuesLeft.size() > 0) {
+            oppMax = oppValuesLeft.get(oppValuesLeft.size() - 1);
+        } else {
+            oppMax = -1;
+        }
 
         ownFields = findFields(board, true);
         oppFields = findFields(board, false);
@@ -70,7 +77,7 @@ public class CompetitionAI extends PenguAI {
 
         //calculate winningMoves for this AI and play if possible
         List<int[]> winningMoves = calcWinningMoves(ownLegalMoves, ownFields);
-        winningMoves.forEach(le -> System.out.println(Arrays.toString(le)));
+        //winningMoves.forEach(le -> System.out.println(Arrays.toString(le)));
         if (winningMoves.size() > 0) {
             System.out.println("played winning move: ");
             return chooseMove(winningMoves, board);
@@ -161,7 +168,8 @@ public class CompetitionAI extends PenguAI {
             int y = field[1];
             testBoard[x][y] = new Field(ownMax, firstPlayer);
             List<int[]> tempOppLegalMoves = calcLegalMoves(testBoard, false);
-            if (calcWinningMoves(tempOppLegalMoves, oppFields).size() == 0) {
+            List<int[]> tempOppFields = findFields(testBoard, false);
+            if (calcWinningMoves(tempOppLegalMoves, tempOppFields).size() == 0) {
                 //makes winning impossible for opponent
                 output.add(field);
             }
@@ -214,6 +222,10 @@ public class CompetitionAI extends PenguAI {
         int[] xy = moveSet.get(random.nextInt(moveSet.size()));
         Move m = new Move(xy[0], xy[1], ownMax);
         System.out.println(Arrays.toString(xy) + " " + ownMax);
-        return m;
+        if (xy[0] >= 0 && xy[0] <= 2 && xy[1] >= 0 && xy[1] <= 2 && ownMax != -1) {
+            return m;
+        }
+        throw new RuntimeException("Es wurde ein illegaler Zug gespielt");
+        //return makeMove(board, firstPlayer, firstPlayedPieces,secondPlayedPieces);
     }
 }

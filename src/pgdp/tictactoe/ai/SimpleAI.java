@@ -225,7 +225,7 @@ public class SimpleAI extends PenguAI {
         if (xy[0] >= 0 && xy[0] <= 2 && xy[1] >= 0 && xy[1] <= 2 && ownMax != -1) {
             return m;
         }
-        throw new RuntimeException("FUUUUUCKKKKKKK");
+        throw new RuntimeException("Es wurde ein illegaler Zug gespielt");
         //return makeMove(board, firstPlayer, firstPlayedPieces,secondPlayedPieces);
     }
 }
