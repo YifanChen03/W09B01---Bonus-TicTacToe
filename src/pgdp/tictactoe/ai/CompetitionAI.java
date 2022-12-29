@@ -269,6 +269,14 @@ public class CompetitionAI extends PenguAI {
     }
     private Move chooseMove(List<int[]> moveSet, Field[][] board) {
         int[] xy = moveSet.get(random.nextInt(moveSet.size()));
+        //should prefer covered fields
+        for (int[] field : moveSet) {
+            int x = field[0];
+            int y = field[1];
+            if (board[x][y] != null) {
+                xy = field;
+            }
+        }
         int x = xy[0];
         int y = xy[1];
         int value;
@@ -287,5 +295,37 @@ public class CompetitionAI extends PenguAI {
         //Game.printBoard(board);
         System.out.println(Arrays.toString(xy) + " " + value);
         return m;
+        /*if (xy[0] >= 0 && xy[0] <= 2 && xy[1] >= 0 && xy[1] <= 2 && ownMax != -1 && ownValuesLeft.size() > 0) {
+            if ((firstPlayer && !firstPlayedPieces[ownMax]) || (!firstPlayer && !secondPlayedPieces[ownMax])) {
+                if (board[xy[0]][xy[1]] == null || (board[xy[0]][xy[1]].firstPlayer() != firstPlayer
+                        && board[xy[0]][xy[1]].value() < ownMax)){
+                    return m;
+                } else {
+                    Game.printBoard(board);
+                    System.out.println(Arrays.toString(xy) + " " + ownMax);
+                    if (firstPlayer) {
+                        System.out.println("ich bin erster Spieler");
+                    } else {
+                        System.out.println("ich bin zweiter Spieler");
+                    }
+                    System.out.println("firstPlayedPieces: " + Arrays.toString(firstPlayedPieces));
+                    System.out.println("secondPlayedPieces: " + Arrays.toString(secondPlayedPieces));
+                    throw new RuntimeException("Der Zug kann nicht mehr gespielt werden");
+                }
+            } else {
+                Game.printBoard(board);
+                System.out.println(Arrays.toString(xy) + " " + ownMax);
+                if (firstPlayer) {
+                    System.out.println("ich bin erster Spieler");
+                } else {
+                    System.out.println("ich bin zweiter Spieler");
+                }
+                System.out.println("firstPlayedPieces: " + Arrays.toString(firstPlayedPieces));
+                System.out.println("secondPlayedPieces: " + Arrays.toString(secondPlayedPieces));
+                throw new RuntimeException("Der Zug ist kein legalMove");
+            }
+        } else {
+            throw new RuntimeException("Es wurde ein illegaler Zug gespielt");
+        }*/
     }
 }

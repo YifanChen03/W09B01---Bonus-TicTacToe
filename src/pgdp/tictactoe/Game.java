@@ -1,5 +1,6 @@
 package pgdp.tictactoe;
 
+import pgdp.tictactoe.ai.CompetitionAI;
 import pgdp.tictactoe.ai.HumanPlayer;
 import pgdp.tictactoe.ai.SimpleAI;
 
@@ -264,7 +265,7 @@ public class Game {
 
     public static void main(String[] args) {
         PenguAI firstPlayer = new HumanPlayer();
-        PenguAI secondPlayer = new SimpleAI();
+        PenguAI secondPlayer = new CompetitionAI();
         Game game = new Game(firstPlayer, secondPlayer);
         game.playGame();
         if(firstPlayer == game.getWinner()) {
