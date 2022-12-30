@@ -8,7 +8,7 @@ import pgdp.tictactoe.Game;
 import pgdp.tictactoe.Move;
 import pgdp.tictactoe.PenguAI;
 
-public class CompetitionAI extends PenguAI {
+public class CompetitionAIV1 extends PenguAI {
 
     private Random random;
     private List<Integer> ownValuesLeft;
@@ -23,7 +23,7 @@ public class CompetitionAI extends PenguAI {
     private boolean[] firstPlayedPieces;
     private boolean[] secondPlayedPieces;
 
-    public CompetitionAI() {
+    public CompetitionAIV1() {
         random = new Random();
         ownValuesLeft = new ArrayList<>();
         ownMax = 8;
@@ -307,7 +307,7 @@ public class CompetitionAI extends PenguAI {
         for (int[] field : moveSet) {
             int x = field[0];
             int y = field[1];
-            if (board[x][y] != null && !(oppFields.size() <= 2 && board[x][y].value() == 7)) {
+            if (board[x][y] != null) {
                 xy = field;
             }
         }
