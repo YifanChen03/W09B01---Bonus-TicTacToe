@@ -157,7 +157,7 @@ public class CompetitionAI extends PenguAI {
         //check for every Field of xlegalMoves if owning it would be a win
         for (int[] field : xLegalMoves) {
             xFields.add(field);
-            if (Game.checkWin(xFields, null) == 1) {
+            if (CAIcheckWin(xFields, null) == 1) {
                 output.add(field);
             }
             xFields.remove(xFields.size() - 1);
@@ -266,6 +266,40 @@ public class CompetitionAI extends PenguAI {
         }
 
         return output;
+    }
+
+    public int CAIcheckWin(List<int[]> fields1, List<int[]> fields2) {
+        List<List<int[]>> winningPlaces = new ArrayList<>();
+
+        List<int[]> firstRow = Arrays.asList(new int[][]{{0, 0}, {1, 0}, {2, 0}});
+        List<int[]> secondRow = Arrays.asList(new int[][]{{0, 1}, {1, 1}, {2, 1}});
+        List<int[]> thirdRow = Arrays.asList(new int[][]{{0, 2}, {1, 2}, {2, 2}});
+        List<int[]> firstCol = Arrays.asList(new int[][]{{0, 0}, {0, 1}, {0, 2}});
+        List<int[]> secondCol = Arrays.asList(new int[][]{{1, 0}, {1, 1}, {1, 2}});
+        List<int[]> thirdCol = Arrays.asList(new int[][]{{2, 0}, {2, 1}, {2, 2}});
+        List<int[]> firstDia = Arrays.asList(new int[][]{{0, 0}, {1, 1}, {2, 2}});
+        List<int[]> secondDia = Arrays.asList(new int[][]{{0, 2}, {1, 1}, {2, 0}});
+
+        winningPlaces.add(firstRow);
+        winningPlaces.add(secondRow);
+        winningPlaces.add(thirdRow);
+        winningPlaces.add(firstCol);
+        winningPlaces.add(secondCol);
+        winningPlaces.add(thirdCol);
+        winningPlaces.add(firstDia);
+        winningPlaces.add(secondDia);
+
+        for (List<int[]> row : winningPlaces) {
+            if (fields1 != null && fields1.stream().map(le -> Arrays.toString(le)).collect(Collectors.toList())
+                    .containsAll(row.stream().map(le -> Arrays.toString(le)).collect(Collectors.toList()))) {
+                return 1;
+            }
+            if (fields2 != null && fields2.stream().map(le -> Arrays.toString(le)).collect(Collectors.toList())
+                    .containsAll(row.stream().map(le -> Arrays.toString(le)).collect(Collectors.toList()))) {
+                return 2;
+            }
+        }
+        return 0;
     }
     private Move chooseMove(List<int[]> moveSet, Field[][] board) {
         int[] xy = moveSet.get(random.nextInt(moveSet.size()));
